@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  background-color: white;
+}
+
+:root.dark {
+  color-scheme: dark;
+  background-color: #111827; /* gray-900 */
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Custom styles for the medical app */
+.symptom-tag {
+  transition: all 0.2s ease-in-out;
+}
+
+.symptom-tag:hover {
+  transform: translateY(-2px);
+}
+
+/* D3 visualization styles */
+.node text {
+  pointer-events: none;
+  font-family: sans-serif;
+}
+
+.node circle {
+  transition: r 0.3s ease-in-out;
+}
+
+.node:hover circle {
+  stroke-width: 3px;
+  stroke: #fff;
+}
