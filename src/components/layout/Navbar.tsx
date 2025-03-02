@@ -83,7 +83,7 @@ export const Navbar: React.FC = () => {
               bgClip="text"
               _hover={{ textDecoration: 'none' }}
             >
-              MedDiagnosis
+              PhenoWise
             </Link>
           </Flex>
           
@@ -160,7 +160,7 @@ export const Navbar: React.FC = () => {
             <Flex justify="space-between" align="center">
               <Flex align="center">
                 <Brain className="h-6 w-6 text-indigo-600 dark:text-indigo-400 mr-2" />
-                <Text fontWeight="bold">MedDiagnosis</Text>
+                <Text fontWeight="bold">PhenoWise</Text>
               </Flex>
               <IconButton
                 icon={<X size={18} />}

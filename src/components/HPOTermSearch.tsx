@@ -316,6 +316,7 @@ export const HPOTermSearch: React.FC = () => {
               leftIcon={<Brain size={16} />}
               isLoading={diagnosesStatus === 'loading'}
               loadingText="Analyzing"
+              
             >
               Analyze Symptoms
             </Button>

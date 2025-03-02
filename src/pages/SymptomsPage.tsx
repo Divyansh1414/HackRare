@@ -106,8 +106,8 @@ export const SymptomsPage: React.FC = () => {
       </Flex>
       
       <HPOTermSearch />
-      <DisorderRecommendations />
       <SymptomSuggestions />
+      <DisorderRecommendations />
       <PatientDashboard />
     </Box>
   );

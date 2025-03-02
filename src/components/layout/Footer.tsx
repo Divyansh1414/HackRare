@@ -22,7 +22,7 @@ export const Footer: React.FC = () => {
       >
         <Stack direction="row" alignItems="center">
           <Brain className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-          <Text fontWeight="bold">MedDiagnosis</Text>
+          <Text fontWeight="bold">PhenoWise</Text>
         </Stack>
         
         <Text>
