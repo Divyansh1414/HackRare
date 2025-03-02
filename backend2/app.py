@@ -4,6 +4,9 @@ import pandas as pd
 import sqlite3
 import re
 from phrank_modified import Phrank
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -64,7 +67,7 @@ async def analyze_symptoms(data: dict):
 
     symptoms = data.get("symptoms", [])
     frequency = data.get("frequency", [])
-
+    
     # Filtering step
     filtered_df = df
     if symptoms:
@@ -90,6 +93,70 @@ async def analyze_symptoms(data: dict):
         # "filtered_symptoms": filtered_df[["HPO ID", "HPO Term", "Frequency"]].to_dict(orient="records"),
         "disease_ranking": ranked_diseases
     }
+
+# 🔹 Symptom Suggestion Algorithm Using TF-IDF and Cosine Similarity
+def suggest_symptoms(user_symptoms, top_n=5):
+    print("🚀 Running Symptom Suggestion Algorithm")  # Debugging Print
+    
+    if df is None:
+        print("❌ Error: Dataset not loaded")
+        raise HTTPException(status_code=500, detail="Dataset not loaded")
+
+    # Create a TF-IDF Vectorizer model
+    vectorizer = TfidfVectorizer()
+    
+    # Get all unique diseases with associated symptoms
+    disease_symptom_data = df.groupby("Disorder Name")["HPO Term"].apply(lambda x: " ".join(x)).reset_index()
+
+    # Fit and transform symptoms into TF-IDF matrix
+    tfidf_matrix = vectorizer.fit_transform(disease_symptom_data["HPO Term"])
+
+    # Convert user symptoms to a TF-IDF vector
+    user_symptom_query = " ".join(user_symptoms)
+    user_vector = vectorizer.transform([user_symptom_query])
+
+    # Compute cosine similarity between user symptoms and disease symptoms
+    cosine_similarities = cosine_similarity(user_vector, tfidf_matrix).flatten()
+
+    # Get the top similar diseases
+    top_disease_indices = cosine_similarities.argsort()[-top_n:][::-1]
+
+    suggested_symptoms = set()
+    
+    # Extract suggested symptoms from the most similar diseases
+    for idx in top_disease_indices:
+        disease_symptoms = disease_symptom_data.iloc[idx]["HPO Term"].split()
+        suggested_symptoms.update(disease_symptoms)
+
+    # Remove already selected symptoms
+    suggested_symptoms = list(set(suggested_symptoms) - set(user_symptoms))
+    
+    # Fetch HPO IDs for suggested symptoms
+    suggestions = df[df["HPO Term"].isin(suggested_symptoms)][["HPO ID", "HPO Term"]].drop_duplicates().to_dict(orient="records")
+
+    print("🔍 Suggested Symptoms:", suggestions)  # Debugging Print
+
+    return suggestions[:top_n]
+
+
+# 🔹 New API Endpoint for Symptom Suggestions
+@app.post("/suggest_symptoms")
+async def suggest_additional_symptoms(data: dict):
+    print("📥 Incoming Request Data:", data)  # Debugging Print
+    
+    user_symptoms = data.get("symptoms", [])
+    
+    if not user_symptoms:
+        print("❌ No symptoms provided")  # Debugging Print
+        raise HTTPException(status_code=400, detail="No symptoms provided for suggestion.")
+
+    print("✅ Calling suggest_symptoms with:", user_symptoms)  # Debugging Print
+
+    suggestions = suggest_symptoms(user_symptoms, top_n=5)
+
+    print("✅ Suggestions Generated:", suggestions)  # Debugging Print
+
+    return {"suggested_symptoms": suggestions}
 
 if __name__ == "__main__":
     import uvicorn

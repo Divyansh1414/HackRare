@@ -65,6 +65,7 @@ interface SymptomsState {
   searchResults: HPOTerm[];
   relatedDisorders: Array<{
     name: string;
+    link: string;
     relevanceScore: number;
     matchedSymptomCount: number;
     totalSymptomCount: number;
